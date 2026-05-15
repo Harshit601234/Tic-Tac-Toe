@@ -3,122 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supabase Tic-Tac-Toe</title>
+    <title>Tic-Tac-Toe Realtime</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .cell { transition: all 0.2s ease; }
-        .cell:hover:not(:disabled) { transform: scale(1.05); background-color: #e2e8f0; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .cell { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .cell:hover:not(:disabled) { transform: scale(1.02); background-color: #f8fafc; }
         .cell:active:not(:disabled) { transform: scale(0.95); }
-        .cell-x { color: #3b82f6; } /* Tailwind blue-500 */
-        .cell-o { color: #ef4444; } /* Tailwind red-500 */
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-800">
+<body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200">
+    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
         
         <!-- Setup Screen -->
-        <div id="setup-screen" class="space-y-6">
+        <div id="setup-screen" class="p-8 space-y-6">
             <div class="text-center">
-                <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-2">Tic-Tac-Toe</h1>
-                <p class="text-slate-500">Real-time multiplayer via Supabase</p>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Tic-Tac-Toe</h1>
+                <p class="text-slate-500 mt-1">Real-time Multiplayer</p>
             </div>
             
-            <div id="auth-status" class="text-sm text-center text-amber-600 bg-amber-50 p-2 rounded-lg">
-                Connecting to Supabase...
+            <div id="auth-status" class="text-xs font-medium text-center p-3 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+                ⚡ Initializing connection...
             </div>
 
             <div class="space-y-4">
-                <input type="text" id="game-id-input" placeholder="Enter Room Name (e.g., room1)" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" disabled>
-                <button id="join-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    Join / Create Room
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1 ml-1">Room Name</label>
+                    <input type="text" id="game-id-input" placeholder="e.g. secret-room-123" 
+                        class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all" disabled>
+                </div>
+                <button id="join-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Join or Create Room
                 </button>
             </div>
         </div>
 
         <!-- Game Screen -->
-        <div id="game-screen" class="hidden space-y-6">
-            <!-- Header info -->
-            <div class="flex justify-between items-center text-sm font-bold uppercase tracking-wider border-b border-slate-100 pb-4">
-                <span id="room-id-display" class="text-slate-500 bg-slate-100 px-3 py-1 rounded-md"></span>
-                <span id="role-display" class="px-3 py-1 rounded-md"></span>
+        <div id="game-screen" class="hidden p-6 space-y-6">
+            <div class="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-slate-400">
+                <span id="room-id-display" class="bg-slate-100 px-3 py-1 rounded-full"></span>
+                <span id="role-display" class="px-3 py-1 rounded-full"></span>
             </div>
 
-            <!-- Status Message -->
-            <div id="status-message" class="text-center p-3 text-lg font-semibold rounded-xl bg-slate-50 border border-slate-100 transition-colors">
-                Loading...
+            <div id="status-message" class="text-center py-4 text-lg font-bold rounded-2xl bg-slate-50 border border-slate-100 transition-all">
+                Loading game...
             </div>
 
-            <!-- The Board -->
+            <!-- The Grid -->
             <div id="board" class="grid grid-cols-3 gap-3 aspect-square">
-                <!-- Cells generated dynamically by JavaScript -->
+                <!-- Cells generated dynamically -->
             </div>
 
-            <!-- Actions -->
-            <div class="pt-4 border-t border-slate-100 space-y-3">
-                <button id="reset-btn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 rounded-xl transition-colors hidden">
-                    Play Again
+            <div class="pt-4 space-y-3">
+                <button id="reset-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all hidden">
+                    New Round
                 </button>
-                <button id="leave-btn" class="w-full bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 rounded-xl transition-colors">
-                    Leave Room
+                <button id="leave-btn" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl transition-all">
+                    Exit Lobby
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- YOUR CREDENTIALS ---
         const SUPABASE_URL = 'https://xhdvsrpediosbblvbgbo.supabase.co';
-        // Using the Anon key you provided:
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHZzcnBlZGlvc2JibHZiZ2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NDU2NTgsImV4cCI6MjA5NDQyMTY1OH0.LNw9DuCD5EBBD0h2Y6UYYkZlUSZbewLk9d8UCje88OM';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // FIXED: Renamed variable to avoid collision with global 'supabase' object
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- GLOBAL STATE ---
         let myUserId = null;
         let currentGameId = null;
         let myRole = null; 
-        let channel = null;
+        let gameSubscription = null;
 
-        const WIN_PATTERNS = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Cols
-            [0, 4, 8], [2, 4, 6]             // Diagonals
-        ];
-
-        async function init() {
+        async function start() {
+            const statusDiv = document.getElementById('auth-status');
             try {
-                // 1. Sign in anonymously so RLS policies pass
-                const { data, error } = await supabase.auth.signInAnonymously();
+                // 1. Authenticate
+                const { data, error } = await _supabase.auth.signInAnonymously();
                 
-                if (error) throw error;
+                if (error) {
+                    throw new Error("Authentication failed: " + error.message);
+                }
                 
                 myUserId = data.user.id;
-                console.log("Authenticated as:", myUserId);
                 
-                // Update UI to allow playing
-                const statusDiv = document.getElementById('auth-status');
-                statusDiv.innerText = "Connected!";
-                statusDiv.classList.replace('text-amber-600', 'text-green-600');
-                statusDiv.classList.replace('bg-amber-50', 'bg-green-50');
+                // 2. Unlock UI
+                statusDiv.innerText = "✅ Ready to Play";
+                statusDiv.className = "text-xs font-medium text-center p-3 rounded-xl bg-green-50 text-green-600 border border-green-100";
                 
-                setTimeout(() => statusDiv.classList.add('hidden'), 1500);
-
                 document.getElementById('game-id-input').disabled = false;
                 document.getElementById('join-btn').disabled = false;
 
-                // Event Listeners
+                // Bind buttons
                 document.getElementById('join-btn').onclick = joinGame;
-                document.getElementById('leave-btn').onclick = leaveRoom;
+                document.getElementById('leave-btn').onclick = () => window.location.reload();
                 document.getElementById('reset-btn').onclick = resetGame;
 
             } catch (err) {
-                console.error("Initialization Error:", err);
-                document.getElementById('auth-status').innerText = "Auth failed. Did you enable Anonymous Auth in Supabase?";
-                document.getElementById('auth-status').classList.replace('text-amber-600', 'text-red-600');
-                document.getElementById('auth-status').classList.replace('bg-amber-50', 'bg-red-50');
+                console.error(err);
+                statusDiv.innerHTML = `❌ Error: ${err.message}<br><small class="opacity-75">Check if 'Anonymous Auth' is enabled in Supabase Settings.</small>`;
+                statusDiv.className = "text-xs font-medium text-center p-3 rounded-xl bg-red-50 text-red-600 border border-red-100";
             }
         }
 
@@ -130,215 +119,152 @@
             currentGameId = gameId;
 
             try {
-                // Check if game exists
-                const { data: game, error: fetchError } = await supabase
+                const { data: game, error } = await _supabase
                     .from('games')
                     .select('*')
                     .eq('id', gameId)
                     .maybeSingle();
 
-                if (fetchError) {
-                    console.error("Error fetching game:", fetchError);
-                    alert("Error checking room. Is your SQL table set up correctly?");
-                    return;
-                }
+                if (error) throw error;
 
                 if (!game) {
-                    // Create new game as Player X
-                    const { error: insertError } = await supabase.from('games').insert({ 
+                    // Create game
+                    const { error: insErr } = await _supabase.from('games').insert({ 
                         id: gameId, 
                         player_x: myUserId, 
                         status: 'waiting',
-                        board: ["", "", "", "", "", "", "", "", ""],
+                        board: Array(9).fill(""),
                         turn: 'X'
                     });
-                    
-                    if (insertError) throw insertError;
+                    if (insErr) throw insErr;
                     myRole = 'X';
                 } else {
-                    // Game exists, try to join
+                    // Join existing
                     if (game.player_x === myUserId) {
-                        myRole = 'X'; // Rejoining own game
+                        myRole = 'X';
                     } else if (!game.player_o || game.player_o === myUserId) {
-                        myRole = 'O'; // Join as O
-                        await supabase.from('games').update({ 
+                        myRole = 'O';
+                        await _supabase.from('games').update({ 
                             player_o: myUserId, 
                             status: 'playing' 
                         }).eq('id', gameId);
                     } else {
-                        alert("Room is full!"); 
-                        return;
+                        return alert("Room is full!");
                     }
                 }
 
-                setupUI();
-                subscribeToChanges();
-                fetchState(); // Initial render
+                showGameUI();
+                listenForMoves();
+                refreshState();
 
             } catch (err) {
-                console.error("Error joining game:", err);
-                alert("Failed to join. See console for details.");
+                alert("Database Error: " + err.message + "\nMake sure you created the 'games' table in Supabase SQL Editor!");
             }
         }
 
-        function subscribeToChanges() {
-            if (channel) {
-                supabase.removeChannel(channel);
-            }
+        function listenForMoves() {
+            if (gameSubscription) _supabase.removeChannel(gameSubscription);
 
-            // Listen for any updates to this specific game row
-            channel = supabase
-                .channel(`game_${currentGameId}`)
-                .on(
-                    'postgres_changes', 
-                    { 
-                        event: 'UPDATE', 
-                        schema: 'public', 
-                        table: 'games', 
-                        filter: `id=eq.${currentGameId}` 
-                    }, 
-                    (payload) => {
-                        console.log("Realtime update received:", payload.new);
-                        renderBoard(payload.new);
-                    }
-                )
-                .subscribe((status) => {
-                    console.log("Subscription status:", status);
-                });
-        }
-
-        async function fetchState() {
-            const { data } = await supabase.from('games').select('*').eq('id', currentGameId).single();
-            if (data) renderBoard(data);
-        }
-
-        function checkWinner(board) {
-            for (let pattern of WIN_PATTERNS) {
-                const [a, b, c] = pattern;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    return board[a]; // Returns 'X' or 'O'
-                }
-            }
-            if (!board.includes("")) return "Draw";
-            return null;
-        }
-
-        async function makeMove(index, currentBoard, currentTurn) {
-            // Validate move
-            if (currentTurn !== myRole || currentBoard[index] !== "") return;
-            
-            // Optimistic local update (optional, but makes UI feel faster)
-            const nextBoard = [...currentBoard];
-            nextBoard[index] = myRole;
-            
-            // Calculate outcome
-            const winner = checkWinner(nextBoard);
-            const nextTurn = myRole === 'X' ? 'O' : 'X';
-            let newStatus = 'playing';
-
-            if (winner) {
-                newStatus = 'finished';
-            }
-
-            // Push to Supabase
-            const { error } = await supabase.from('games')
-                .update({ 
-                    board: nextBoard, 
-                    turn: nextTurn,
-                    status: newStatus,
-                    winner: winner || null
+            gameSubscription = _supabase
+                .channel(`game:${currentGameId}`)
+                .on('postgres_changes', { 
+                    event: 'UPDATE', 
+                    schema: 'public', 
+                    table: 'games', 
+                    filter: `id=eq.${currentGameId}` 
+                }, (payload) => {
+                    updateBoardUI(payload.new);
                 })
-                .eq('id', currentGameId);
-                
-            if (error) console.error("Error making move:", error);
+                .subscribe();
+        }
+
+        async function refreshState() {
+            const { data } = await _supabase.from('games').select('*').eq('id', currentGameId).single();
+            if (data) updateBoardUI(data);
+        }
+
+        async function makeMove(idx, board, turn) {
+            if (turn !== myRole || board[idx] !== "") return;
+            
+            const nextBoard = [...board];
+            nextBoard[idx] = myRole;
+            
+            const winner = checkWin(nextBoard);
+            const nextTurn = myRole === 'X' ? 'O' : 'X';
+            
+            await _supabase.from('games').update({ 
+                board: nextBoard, 
+                turn: nextTurn,
+                status: winner ? 'finished' : 'playing',
+                winner: winner || null
+            }).eq('id', currentGameId);
+        }
+
+        function checkWin(b) {
+            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (let [a,b1,c] of lines) {
+                if (b[a] && b[a] === b[b1] && b[a] === b[c]) return b[a];
+            }
+            return b.includes("") ? null : "Draw";
         }
 
         async function resetGame() {
-            await supabase.from('games').update({
-                board: ["", "", "", "", "", "", "", "", ""],
+            await _supabase.from('games').update({
+                board: Array(9).fill(""),
                 turn: 'X',
                 status: 'playing',
                 winner: null
             }).eq('id', currentGameId);
         }
 
-        function renderBoard(game) {
-            const boardDiv = document.getElementById('board');
-            boardDiv.innerHTML = '';
+        function updateBoardUI(game) {
+            const container = document.getElementById('board');
+            container.innerHTML = '';
             
-            // Render grid
-            game.board.forEach((cell, i) => {
-                const btn = document.createElement('button');
-                const isX = cell === 'X';
+            game.board.forEach((val, i) => {
+                const b = document.createElement('button');
+                b.className = `cell h-full w-full bg-white border border-slate-200 rounded-2xl text-4xl font-black shadow-sm flex items-center justify-center`;
+                if (val === 'X') b.classList.add('text-blue-500');
+                if (val === 'O') b.classList.add('text-rose-500');
+                b.innerText = val;
                 
-                btn.className = `cell h-24 sm:h-28 text-5xl font-black rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center ${isX ? 'cell-x' : 'cell-o'}`;
-                btn.innerText = cell;
-                
-                // Disable button if game is waiting, finished, not your turn, or cell is filled
-                btn.disabled = cell !== "" || game.turn !== myRole || game.status !== 'playing';
-                
-                btn.onclick = () => makeMove(i, game.board, game.turn);
-                boardDiv.appendChild(btn);
+                const myTurn = game.turn === myRole && game.status === 'playing';
+                b.disabled = val !== "" || !myTurn;
+                b.onclick = () => makeMove(i, game.board, game.turn);
+                container.appendChild(b);
             });
 
-            // Update Status Message
-            const statusEl = document.getElementById('status-message');
-            const resetBtn = document.getElementById('reset-btn');
+            const msg = document.getElementById('status-message');
+            const reset = document.getElementById('reset-btn');
 
             if (game.status === 'waiting') {
-                statusEl.innerText = "Waiting for an opponent to join...";
-                statusEl.className = "text-center p-3 text-lg font-semibold rounded-xl bg-amber-50 text-amber-700 border border-amber-200";
-                resetBtn.classList.add('hidden');
-            } 
-            else if (game.status === 'finished') {
-                resetBtn.classList.remove('hidden');
-                if (game.winner === 'Draw') {
-                    statusEl.innerText = "It's a Draw!";
-                    statusEl.className = "text-center p-3 text-lg font-semibold rounded-xl bg-slate-100 text-slate-700 border border-slate-300";
-                } else if (game.winner === myRole) {
-                    statusEl.innerText = "🎉 You Won!";
-                    statusEl.className = "text-center p-3 text-lg font-semibold rounded-xl bg-green-100 text-green-700 border border-green-300";
-                } else {
-                    statusEl.innerText = "💀 You Lost!";
-                    statusEl.className = "text-center p-3 text-lg font-semibold rounded-xl bg-red-100 text-red-700 border border-red-300";
-                }
-            } 
-            else {
-                resetBtn.classList.add('hidden');
-                if (game.turn === myRole) {
-                    statusEl.innerText = "Your Turn!";
-                    statusEl.className = "text-center p-3 text-lg font-semibold rounded-xl bg-blue-100 text-blue-700 border border-blue-300";
-                } else {
-                    statusEl.innerText = "Opponent's Turn";
-                    statusEl.className = "text-center p-3 text-lg font-semibold rounded-xl bg-slate-50 text-slate-500 border border-slate-200";
-                }
+                msg.innerText = "⌛ Waiting for Opponent...";
+                msg.className = "text-center py-4 text-lg font-bold rounded-2xl bg-amber-50 text-amber-600 border border-amber-100";
+            } else if (game.status === 'finished') {
+                reset.classList.remove('hidden');
+                if (game.winner === 'Draw') msg.innerText = "🤝 Draw!";
+                else msg.innerText = game.winner === myRole ? "🏆 You Won!" : "💀 You Lost!";
+                msg.className = "text-center py-4 text-lg font-bold rounded-2xl bg-slate-800 text-white";
+            } else {
+                reset.classList.add('hidden');
+                msg.innerText = game.turn === myRole ? "🎯 Your Turn" : "⏳ Opponent's Turn";
+                msg.className = game.turn === myRole ? 
+                    "text-center py-4 text-lg font-bold rounded-2xl bg-blue-50 text-blue-600 border border-blue-200" : 
+                    "text-center py-4 text-lg font-bold rounded-2xl bg-slate-50 text-slate-400 border border-slate-100";
             }
         }
 
-        function setupUI() {
+        function showGameUI() {
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
-            
-            document.getElementById('room-id-display').innerText = `Room: ${currentGameId}`;
-            
-            const roleEl = document.getElementById('role-display');
-            roleEl.innerText = `Player ${myRole}`;
-            roleEl.className = `px-3 py-1 rounded-md text-white font-bold ${myRole === 'X' ? 'bg-blue-500' : 'bg-red-500'}`;
+            document.getElementById('room-id-display').innerText = `ROOM: ${currentGameId}`;
+            const role = document.getElementById('role-display');
+            role.innerText = `YOU: ${myRole}`;
+            role.className = `px-3 py-1 rounded-full text-white ${myRole === 'X' ? 'bg-blue-500' : 'bg-rose-500'}`;
         }
 
-        function leaveRoom() {
-            if (channel) {
-                supabase.removeChannel(channel);
-            }
-            currentGameId = null;
-            myRole = null;
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('setup-screen').classList.remove('hidden');
-            document.getElementById('game-id-input').value = '';
-        }
-
-        // Start app
-        init();
+        // Start the engine
+        window.onload = start;
     </script>
 </body>
 </html>
