@@ -178,6 +178,9 @@
     @keyframes slideIn { from{transform:translateX(110%);opacity:0} to{transform:translateX(0);opacity:1} }
     .loading-screen { flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1rem; }
     .loading-logo { font-family:var(--fd); font-size:3rem; letter-spacing:0.1em; color:var(--muted); }
+    .site-footer { text-align:center; padding:1rem; font-size:0.67rem; letter-spacing:0.18em; color:var(--muted); border-top:1px solid var(--border); }
+    .site-footer a { color:var(--accent); text-decoration:none; font-weight:700; }
+    .site-footer a:hover { color:var(--accenthov); text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -436,31 +439,47 @@ function Lobby({ player, onJoinRoom, onLogout, toast }) {
 function GameRoom({ roomId, player, role, onLeave, toast }) {
   const [room, setRoom] = useState(null);
   const subRef = useRef(null);
+  // Keep a ref to always have the latest room state inside async callbacks/closures
+  const roomRef = useRef(null);
+  const setRoomSync = (data) => {
+    roomRef.current = data;
+    setRoom(data);
+  };
 
   useEffect(() => {
     let active = true;
 
+    // Initial fetch
     DB.from("rooms").select("*").eq("id", roomId).single().then(({ data, error }) => {
       if (!active) return;
       if (error || !data) { toast.add("Room not found"); onLeave(); return; }
-      setRoom(data);
+      setRoomSync(data);
     });
 
-    subRef.current = DB.channel("game-" + roomId + "-" + Date.now())
+    const channel = DB.channel("game-" + roomId + "-" + Date.now())
       .on("postgres_changes",
         { event: "UPDATE", schema: "public", table: "rooms", filter: `id=eq.${roomId}` },
-        payload => { if (active) setRoom(payload.new); }
+        payload => {
+          if (!active) return;
+          // payload.new may be partial if replica identity is not FULL;
+          // always re-fetch to guarantee a complete, fresh row.
+          DB.from("rooms").select("*").eq("id", roomId).single()
+            .then(({ data }) => { if (data && active) setRoomSync(data); });
+        }
       )
       .on("postgres_changes",
         { event: "DELETE", schema: "public", table: "rooms", filter: `id=eq.${roomId}` },
         () => { if (active) { toast.add("Room was deleted"); onLeave(); } }
       )
       .subscribe(status => {
+        // Re-fetch on subscribe to catch any update that happened before the channel was ready
         if (status === "SUBSCRIBED" && active) {
           DB.from("rooms").select("*").eq("id", roomId).single()
-            .then(({ data }) => { if (data && active) setRoom(data); });
+            .then(({ data }) => { if (data && active) setRoomSync(data); });
         }
       });
+
+    subRef.current = channel;
 
     return () => {
       active = false;
@@ -469,14 +488,29 @@ function GameRoom({ roomId, player, role, onLeave, toast }) {
   }, [roomId]);
 
   async function makeMove(idx) {
-    if (!room) return;
+    const current = roomRef.current;
+    if (!current) return;
     const sym = role === "host" ? "X" : "O";
-    if (room.current_turn!==sym || room.board[idx] || room.winner || !room.guest_id) return;
-    const nb = [...room.board]; nb[idx] = sym;
+    if (current.current_turn !== sym || current.board[idx] || current.winner || !current.guest_id) return;
+
+    const nb = [...current.board];
+    nb[idx] = sym;
     const res = checkWinner(nb);
-    await DB.from("rooms").update({
-      board: nb, current_turn: sym==="X"?"O":"X", winner: res ? res.winner : null
+    const nextTurn = sym === "X" ? "O" : "X";
+    const nextWinner = res ? res.winner : null;
+
+    // Optimistic update: reflect the move instantly in the UI
+    setRoomSync({ ...current, board: nb, current_turn: nextTurn, winner: nextWinner });
+
+    const { error } = await DB.from("rooms").update({
+      board: nb, current_turn: nextTurn, winner: nextWinner
     }).eq("id", roomId);
+
+    // If the DB write failed, roll back to the previous state
+    if (error) {
+      toast.add("Move failed, retrying…");
+      setRoomSync(current);
+    }
   }
 
   async function resetGame() {
@@ -611,6 +645,7 @@ function App() {
           onLeave={()=>setScreen("lobby")} toast={toast} />
       )}
       <Toasts toasts={toast.toasts} />
+      <footer className="site-footer">MADE BY <a href="https://github.com/Harshit-code07" target="_blank" rel="noopener noreferrer">HARSHIT</a></footer>
     </div>
   );
 }
