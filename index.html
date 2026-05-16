@@ -264,78 +264,10 @@ function Toasts({ toasts }) {
   );
 }
 
-// ─── CONFIG SCREEN ────────────────────────────────────────────────────────
-function ConfigScreen({ onSave }) {
-  const [url, setUrl] = useState(localStorage.getItem("sb_url")||"");
-  const [key, setKey] = useState(localStorage.getItem("sb_key")||"");
 
-  return (
-    <div className="config-screen">
-      <div className="config-card">
-        <div className="config-title">SUPABASE SETUP</div>
-        <div className="config-sub">FOLLOW THESE STEPS TO CONFIGURE YOUR PROJECT</div>
-
-        <div className="step">
-          <div className="step-num">1</div>
-          <div className="step-text">Go to <strong>supabase.com</strong> → New Project. Copy your <strong>Project URL</strong> and <strong>anon public key</strong> from <strong>Settings → API</strong>.</div>
-        </div>
-
-        <div className="step">
-          <div className="step-num">2</div>
-          <div className="step-text">In the <strong>SQL Editor</strong>, run this to create the rooms table:</div>
-        </div>
-        <div className="sql-block">{`create table public.rooms (
-  id text primary key,
-  name text not null,
-  host_id text not null,
-  host_name text not null,
-  guest_id text,
-  guest_name text,
-  board text[] default array_fill(null::text, array[9]),
-  current_turn text default 'X',
-  winner text,
-  status text default 'inactive',
-  created_at timestamptz default now()
-);`}</div>
-
-        <div className="step">
-          <div className="step-num">3</div>
-          <div className="step-text">Enable <strong>RLS</strong> with an open policy (for demo):</div>
-        </div>
-        <div className="sql-block">{`alter table public.rooms enable row level security;
-
-create policy "Allow all" on public.rooms
-  for all using (true) with check (true);`}</div>
-
-        <div className="step">
-          <div className="step-num">4</div>
-          <div className="step-text">Enable <strong>Realtime</strong>: go to <strong>Database → Replication</strong>, toggle <strong>rooms</strong> table ON. Then run:</div>
-        </div>
-        <div className="sql-block">{`alter table public.rooms replica identity full;`}</div>
-
-        <div className="step">
-          <div className="step-num">5</div>
-          <div className="step-text">Paste your credentials below and click <strong>CONNECT</strong>.</div>
-        </div>
-
-        <div className="config-field">
-          <div className="field-label">Supabase Project URL</div>
-          <input className="field" style={{width:"100%"}} placeholder="https://xxxx.supabase.co" value={url} onChange={e=>setUrl(e.target.value)}/>
-        </div>
-        <div className="config-field">
-          <div className="field-label">Anon Public Key</div>
-          <input className="field" style={{width:"100%"}} placeholder="eyJhbGci..." value={key} onChange={e=>setKey(e.target.value)}/>
-        </div>
-        <button className="btn btn-primary" style={{width:"100%"}} disabled={!url||!key} onClick={()=>onSave(url.trim(),key.trim())}>
-          CONNECT TO SUPABASE
-        </button>
-      </div>
-    </div>
-  );
-}
 
 // ─── SETUP SCREEN ─────────────────────────────────────────────────────────
-function SetupScreen({ onJoin, onConfigure }) {
+function SetupScreen({ onJoin }) {
   const [name, setName] = useState(genName());
   return (
     <div className="setup-screen">
@@ -344,15 +276,12 @@ function SetupScreen({ onJoin, onConfigure }) {
         <div className="logo-sub">MULTIPLAYER · REALTIME · SUPABASE</div>
         <div className="field-label">Your Name</div>
         <div className="field-row">
-          <input className="field" value={name} onChange={e=>setName(e.target.value)} maxLength={16} placeholder="Enter name…"/>
+          <input className="field" value={name} onChange={e=>setName(e.target.value)} maxLength={16} placeholder="Enter name…"
+            onKeyDown={e=>e.key==="Enter"&&name.trim()&&onJoin(name.trim())}/>
           <button className="btn btn-secondary" onClick={()=>setName(genName())}>⟳</button>
         </div>
         <button className="btn btn-primary" style={{width:"100%"}} onClick={()=>onJoin(name.trim()||"Player")} disabled={!name.trim()}>
           ENTER LOBBY
-        </button>
-        <div className="divider">CONFIG</div>
-        <button className="btn btn-secondary" style={{width:"100%", fontSize:"0.7rem"}} onClick={onConfigure}>
-          ⚙ SUPABASE SETTINGS & SETUP GUIDE
         </button>
       </div>
     </div>
@@ -615,44 +544,33 @@ function GameRoom({ db, roomId, player, role, onLeave, toast }) {
   );
 }
 
+// ─── SUPABASE (hardcoded) ─────────────────────────────────────────────────
+const DB = createClient(
+  "https://xhdvsrpediosbblvbgbo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHZzcnBlZGlvc2JibHZiZ2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NDU2NTgsImV4cCI6MjA5NDQyMTY1OH0.LNw9DuCD5EBBD0h2Y6UYYkZlUSZbewLk9d8UCje88OM"
+);
+
 // ─── APP ROOT ─────────────────────────────────────────────────────────────
 function App() {
-  const [screen, setScreen] = useState("config");
-  const [db, setDb]         = useState(null);
+  const [screen, setScreen] = useState("setup");
   const [player, setPlayer] = useState(null);
   const [gameInfo, setGameInfo] = useState(null);
   const toast = useToast();
 
-  useEffect(() => {
-    const url = localStorage.getItem("sb_url");
-    const key = localStorage.getItem("sb_key");
-    if (url && key) { setDb(createClient(url, key)); setScreen("setup"); }
-  }, []);
-
-  function handleSaveConfig(url, key) {
-    localStorage.setItem("sb_url", url);
-    localStorage.setItem("sb_key", key);
-    setDb(createClient(url, key));
-    toast.add("✅ Connected to Supabase!");
-    setScreen("setup");
-  }
-
   return (
     <div className="app">
-      {screen==="config" && <ConfigScreen onSave={handleSaveConfig}/>}
       {screen==="setup" && (
         <SetupScreen
           onJoin={name=>{ setPlayer({id:genId(),name}); setScreen("lobby"); }}
-          onConfigure={()=>setScreen("config")}
         />
       )}
-      {screen==="lobby" && db && player && (
-        <Lobby db={db} player={player}
+      {screen==="lobby" && player && (
+        <Lobby db={DB} player={player}
           onJoinRoom={(id,role)=>{ setGameInfo({roomId:id,role}); setScreen("game"); }}
           toast={toast}/>
       )}
-      {screen==="game" && db && player && gameInfo && (
-        <GameRoom db={db} roomId={gameInfo.roomId} player={player} role={gameInfo.role}
+      {screen==="game" && player && gameInfo && (
+        <GameRoom db={DB} roomId={gameInfo.roomId} player={player} role={gameInfo.role}
           onLeave={()=>setScreen("lobby")} toast={toast}/>
       )}
       <Toasts toasts={toast.toasts}/>
