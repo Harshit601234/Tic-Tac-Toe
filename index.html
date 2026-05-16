@@ -39,6 +39,18 @@
                     Join or Create Room
                 </button>
             </div>
+
+            <div class="mt-8 border-t border-slate-100 pt-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Available Rooms</h2>
+                    <span id="rooms-count" class="text-xs font-bold bg-blue-50 text-blue-600 px-2 py-1 rounded-md">0</span>
+                </div>
+                <div id="rooms-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <div class="text-xs text-slate-400 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        Loading rooms...
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Game Screen -->
@@ -68,6 +80,22 @@
         </div>
     </div>
 
+    <footer class="mt-8 flex items-center gap-2 text-slate-400 text-xs font-medium tracking-tight">
+        <span>Made by</span>
+        <a href="https://github.com/Harshit-code07" target="_blank" 
+           class="group relative flex items-center gap-1.5 transition-all duration-300">
+            <!-- GitHub Icon using SVG -->
+            <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.412-4.041-1.412-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent font-bold tracking-normal group-hover:from-blue-500 group-hover:to-indigo-500 transition-all">
+                Harshit
+            </span>
+            <!-- Modern animated underline -->
+            <span class="absolute -bottom-1 left-5 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300 group-hover:w-[calc(100%-1.25rem)]"></span>
+        </a>
+    </footer>
+
     <script>
         const SUPABASE_URL = 'https://xhdvsrpediosbblvbgbo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHZzcnBlZGlvc2JibHZiZ2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NDU2NTgsImV4cCI6MjA5NDQyMTY1OH0.LNw9DuCD5EBBD0h2Y6UYYkZlUSZbewLk9d8UCje88OM';
@@ -79,6 +107,8 @@
         let currentGameId = null;
         let myRole = null; 
         let gameSubscription = null;
+        let roomsSubscription = null;
+        let availableRooms = [];
 
         async function start() {
             const statusDiv = document.getElementById('auth-status');
@@ -99,6 +129,9 @@
                 document.getElementById('game-id-input').disabled = false;
                 document.getElementById('join-btn').disabled = false;
 
+                await fetchAvailableRooms();
+                subscribeToRooms();
+
                 // Bind buttons
                 document.getElementById('join-btn').onclick = joinGame;
                 document.getElementById('leave-btn').onclick = () => window.location.reload();
@@ -109,6 +142,89 @@
                 statusDiv.innerHTML = `❌ Error: ${err.message}<br><small class="opacity-75">Check if 'Anonymous Auth' is enabled in Supabase Settings.</small>`;
                 statusDiv.className = "text-xs font-medium text-center p-3 rounded-xl bg-red-50 text-red-600 border border-red-100";
             }
+        }
+
+        async function fetchAvailableRooms() {
+            const { data, error } = await _supabase
+                .from('games')
+                .select('*')
+                .eq('status', 'waiting');
+                
+            if (data) {
+                availableRooms = data;
+                renderAvailableRooms();
+            }
+        }
+
+        function subscribeToRooms() {
+            roomsSubscription = _supabase.channel('public:games')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'games' }, payload => {
+                    if (payload.eventType === 'INSERT') {
+                        if (payload.new.status === 'waiting') {
+                            availableRooms.push(payload.new);
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        availableRooms = availableRooms.filter(r => r.id !== payload.old.id);
+                    } else if (payload.eventType === 'UPDATE') {
+                        const index = availableRooms.findIndex(r => r.id === payload.new.id);
+                        if (payload.new.status === 'waiting') {
+                            if (index === -1) availableRooms.push(payload.new);
+                            else availableRooms[index] = payload.new;
+                        } else {
+                            // Room is no longer waiting (someone joined or game ended)
+                            if (index !== -1) availableRooms.splice(index, 1);
+                        }
+                    }
+                    renderAvailableRooms();
+                })
+                .subscribe();
+        }
+
+        function renderAvailableRooms() {
+            const list = document.getElementById('rooms-list');
+            const count = document.getElementById('rooms-count');
+            count.innerText = availableRooms.length;
+
+            if (availableRooms.length === 0) {
+                list.innerHTML = `<div class="text-xs text-slate-400 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">No open rooms right now.<br>Create one above!</div>`;
+                return;
+            }
+            
+            list.innerHTML = availableRooms.map(room => {
+                const isCreator = room.player_x === myUserId;
+                return `
+                    <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-blue-100 hover:shadow-sm transition-all group">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-700">${room.id}</span>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Waiting for Player</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${isCreator ? `
+                                <button onclick="deleteRoom('${room.id}')" class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Room">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                                <button onclick="joinSpecificRoom('${room.id}')" class="px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">Re-join</button>
+                            ` : `
+                                <button onclick="joinSpecificRoom('${room.id}')" class="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md shadow-blue-200 transition-colors">Join</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function deleteRoom(id) {
+            // Optimistically update the UI to make it feel instant
+            availableRooms = availableRooms.filter(r => r.id !== id);
+            renderAvailableRooms();
+            
+            // Delete from Supabase
+            await _supabase.from('games').delete().eq('id', id);
+        }
+
+        function joinSpecificRoom(id) {
+            document.getElementById('game-id-input').value = id;
+            joinGame();
         }
 
         async function joinGame() {
