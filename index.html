@@ -244,6 +244,60 @@
     /* Room card slide-in */
     @keyframes cardIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     .room-card { animation:cardIn 0.2s ease-out both; }
+
+    /* BOT SECTION IN LOBBY */
+    .bot-banner {
+      background:var(--surface); border:1px solid var(--border); border-radius:8px;
+      padding:1.1rem 1.25rem; margin-bottom:1.25rem; position:relative; overflow:hidden;
+      box-shadow:var(--sh); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+    }
+    .bot-banner::before { content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,#7c3aed,var(--accent2)); }
+    .bot-banner-text { display:flex; flex-direction:column; gap:0.2rem; }
+    .bot-banner-title { font-family:var(--fd); font-size:1.5rem; letter-spacing:0.08em;
+      background:linear-gradient(135deg,#7c3aed,var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .bot-banner-sub { font-size:0.62rem; letter-spacing:0.18em; color:var(--muted); }
+    .bot-diff-btns { display:flex; gap:0.45rem; flex-wrap:wrap; }
+    .btn-diff { font-family:var(--fb); font-size:0.67rem; letter-spacing:0.12em; text-transform:uppercase;
+      border-radius:4px; padding:0.42rem 0.9rem; border:1.5px solid; cursor:pointer; transition:all 0.18s; font-weight:700; }
+    .btn-diff:hover { transform:translateY(-2px); box-shadow:var(--sh); }
+    .btn-easy   { background:rgba(26,122,74,0.08);  color:var(--accent);  border-color:rgba(26,122,74,0.4); }
+    .btn-easy:hover   { background:rgba(26,122,74,0.18); }
+    .btn-medium { background:rgba(176,111,0,0.08); color:#b06f00; border-color:rgba(176,111,0,0.4); }
+    .btn-medium:hover { background:rgba(176,111,0,0.18); }
+    .btn-hard   { background:rgba(217,58,95,0.08);  color:var(--accent2); border-color:rgba(217,58,95,0.4); }
+    .btn-hard:hover   { background:rgba(217,58,95,0.18); }
+
+    /* BOT GAME SCREEN */
+    .bot-game { flex:1; display:flex; flex-direction:column; align-items:center; padding:1.5rem; }
+    .bot-game-header { width:100%; max-width:520px; display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.6rem; }
+    .bot-title { font-family:var(--fd); font-size:1.7rem; letter-spacing:0.1em; color:var(--muted); }
+    .diff-easy   { color:var(--accent); }
+    .diff-medium { color:#b06f00; }
+    .diff-hard   { color:var(--accent2); }
+    .bot-thinking {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      font-size:0.65rem; letter-spacing:0.18em; color:var(--muted);
+      padding:0.35rem 0.8rem; background:var(--surface2); border-radius:20px;
+    }
+    .think-dot { width:5px; height:5px; border-radius:50%; background:var(--muted); display:inline-block; }
+    @keyframes blink { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1)} }
+    .think-dot:nth-child(1){ animation:blink 1s 0s infinite; }
+    .think-dot:nth-child(2){ animation:blink 1s 0.18s infinite; }
+    .think-dot:nth-child(3){ animation:blink 1s 0.36s infinite; }
+    .score-strip {
+      width:100%; max-width:520px; display:flex; gap:0.5rem; margin-bottom:1.1rem;
+    }
+    .score-box {
+      flex:1; background:var(--surface); border:1px solid var(--border); border-radius:6px;
+      padding:0.55rem 0.5rem; text-align:center; box-shadow:var(--sh);
+    }
+    .score-label { font-size:0.58rem; letter-spacing:0.18em; color:var(--muted); }
+    .score-val { font-family:var(--fd); font-size:1.8rem; line-height:1.1; }
+    .score-you  { color:var(--accent); }
+    .score-bot  { color:var(--accent2); }
+    .score-draw { color:var(--o-color); }
+
     .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; display:flex; flex-direction:column; gap:0.45rem; z-index:9999; }
     .toast { background:var(--surface); border:1px solid var(--border); border-radius:3px;
       padding:0.55rem 1rem; font-size:0.72rem; letter-spacing:0.04em;
@@ -277,6 +331,270 @@ function checkWinner(board) {
   return null;
 }
 function genId() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
+
+// ─── BOT AI ──────────────────────────────────────────────────────────────────
+
+// Full minimax with alpha-beta pruning — perfect play (used by Hard)
+function minimax(board, isMax, alpha, beta, depth) {
+  const res = checkWinner(board);
+  if (res) {
+    if (res.winner === "O") return 10 - depth;   // bot (O) wins
+    if (res.winner === "X") return depth - 10;   // player (X) wins
+    return 0;                                     // draw
+  }
+  if (isMax) {
+    let best = -Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (board[i]) continue;
+      board[i] = "O";
+      best = Math.max(best, minimax(board, false, alpha, beta, depth + 1));
+      board[i] = null;
+      alpha = Math.max(alpha, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (board[i]) continue;
+      board[i] = "X";
+      best = Math.min(best, minimax(board, true, alpha, beta, depth + 1));
+      board[i] = null;
+      beta = Math.min(beta, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  }
+}
+
+function getBotMove(board, difficulty) {
+  const empty = board.map((v,i) => v ? null : i).filter(i => i !== null);
+  if (empty.length === 0) return null;
+
+  if (difficulty === "easy") {
+    // ~80% random, ~20% try to block/win
+    if (Math.random() < 0.80) return empty[Math.floor(Math.random() * empty.length)];
+    // fall through to basic blocking
+  }
+
+  if (difficulty === "easy" || difficulty === "medium") {
+    // 1. Win if possible
+    for (const i of empty) {
+      const b = [...board]; b[i] = "O";
+      if (checkWinner(b)?.winner === "O") return i;
+    }
+    // 2. Block player from winning
+    for (const i of empty) {
+      const b = [...board]; b[i] = "X";
+      if (checkWinner(b)?.winner === "X") return i;
+    }
+    if (difficulty === "easy") {
+      // Easy: after basic check, still mostly random
+      return empty[Math.floor(Math.random() * empty.length)];
+    }
+    // Medium: prefer centre, then corners, then random
+    if (board[4] === null) return 4;
+    const corners = [0,2,6,8].filter(c => board[c] === null);
+    if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
+    return empty[Math.floor(Math.random() * empty.length)];
+  }
+
+  // Hard: perfect minimax
+  let bestScore = -Infinity, bestMove = empty[0];
+  for (const i of empty) {
+    const b = [...board]; b[i] = "O";
+    const score = minimax(b, false, -Infinity, Infinity, 0);
+    if (score > bestScore) { bestScore = score; bestMove = i; }
+  }
+  return bestMove;
+}
+
+// ─── BOT GAME COMPONENT ───────────────────────────────────────────────────────
+
+function BotGame({ player, difficulty, onLeave }) {
+  // Hard: bot (O) goes first; others: player (X) goes first
+  const botFirst = difficulty === "hard";
+  const initBoard = Array(9).fill(null);
+  const initTurn  = botFirst ? "O" : "X";
+
+  const [board, setBoard]         = useState(initBoard);
+  const [turn, setTurn]           = useState(initTurn);
+  const [winner, setWinner]       = useState(null);
+  const [winLine, setWinLine]     = useState([]);
+  const [thinking, setThinking]   = useState(botFirst); // bot moves immediately if going first
+  const [score, setScore]         = useState({ you:0, bot:0, draw:0 });
+  const boardRef = useRef(initBoard);
+  const turnRef  = useRef(initTurn);
+
+  // Keep refs in sync for timeout callbacks
+  const sync = (b, t) => { boardRef.current = b; turnRef.current = t; setBoard(b); setTurn(t); };
+
+  // Bot move handler
+  const doBotMove = (b) => {
+    setThinking(true);
+    // Slight delay so moves feel deliberate
+    const delay = difficulty === "hard" ? 520 : difficulty === "medium" ? 380 : 260;
+    setTimeout(() => {
+      const idx = getBotMove(b, difficulty);
+      if (idx === null) { setThinking(false); return; }
+      const nb = [...b]; nb[idx] = "O";
+      const res = checkWinner(nb);
+      if (res) {
+        setBoard(nb); boardRef.current = nb;
+        setWinner(res.winner); setWinLine(res.line || []);
+        setScore(s => res.winner === "O" ? {...s, bot:s.bot+1} : {...s, draw:s.draw+1});
+      } else {
+        sync(nb, "X");
+      }
+      setThinking(false);
+    }, delay);
+  };
+
+  // If bot goes first, trigger its opening move once on mount
+  useEffect(() => {
+    if (botFirst) doBotMove(initBoard);
+  }, []);
+
+  function handleCell(idx) {
+    if (thinking || winner || board[idx] || turn !== "X") return;
+    const nb = [...board]; nb[idx] = "X";
+    const res = checkWinner(nb);
+    if (res) {
+      setBoard(nb);
+      setWinner(res.winner); setWinLine(res.line || []);
+      setScore(s => res.winner === "X" ? {...s, you:s.you+1} : {...s, draw:s.draw+1});
+    } else {
+      sync(nb, "O");
+      doBotMove(nb);
+    }
+  }
+
+  function resetGame() {
+    const nb = Array(9).fill(null);
+    const nt = botFirst ? "O" : "X";
+    setWinner(null); setWinLine([]); setThinking(botFirst);
+    sync(nb, nt);
+    if (botFirst) doBotMove(nb);
+  }
+
+  const res      = winner;
+  const isMyTurn = !winner && !thinking && turn === "X";
+  const diffLabels = { easy:"EASY", medium:"MEDIUM", hard:"HARD" };
+  const diffClass  = { easy:"diff-easy", medium:"diff-medium", hard:"diff-hard" };
+
+  let sClass = "st-wait", sMsg = "";
+  if (!winner && thinking)          { sClass="st-wait";      sMsg="BOT IS THINKING…"; }
+  else if (!winner && isMyTurn)     { sClass="st-your-turn"; sMsg="YOUR TURN ✦"; }
+  else if (!winner)                 { sClass="st-wait";      sMsg="BOT'S TURN"; }
+  else if (winner==="draw")         { sClass="st-draw";      sMsg="IT'S A DRAW 🤝"; }
+  else if (winner==="X")            { sClass="st-win";       sMsg="YOU WIN! 🏆"; }
+  else                              { sClass="st-lose";      sMsg="BOT WINS 🤖"; }
+
+  const confettiColors = ["var(--accent)","var(--accent2)","var(--o-color)","#f5a623","#7c3aed"];
+  const confettiPieces = winner === "X"
+    ? Array.from({length:18}, (_,i) => ({
+        id:i, color:confettiColors[i%confettiColors.length],
+        cx:`${(Math.random()-0.5)*260}px`, cy:`${-(Math.random()*200+60)}px`,
+        cr:`${(Math.random()-0.5)*540}deg`,
+        left:`${20+Math.random()*60}%`, top:"60%", delay:`${Math.random()*0.3}s`,
+      }))
+    : [];
+
+  const cellCenter = (idx) => ({
+    x:`${(idx%3+0.5)/3*100}%`, y:`${(Math.floor(idx/3)+0.5)/3*100}%`
+  });
+
+  return (
+    <div className="bot-game">
+      <div className="bot-game-header">
+        <div className="bot-title">
+          VS BOT <span className={diffClass[difficulty]}>[{diffLabels[difficulty]}]</span>
+        </div>
+        <div style={{display:"flex",gap:"0.5rem",alignItems:"center",flexWrap:"wrap"}}>
+          {thinking && !winner && (
+            <div className="bot-thinking">
+              <span className="think-dot"/><span className="think-dot"/><span className="think-dot"/>
+            </div>
+          )}
+          <button className="btn btn-secondary btn-sm" onClick={onLeave}>← LOBBY</button>
+        </div>
+      </div>
+
+      {/* Score strip */}
+      <div className="score-strip">
+        <div className="score-box">
+          <div className="score-label">YOU</div>
+          <div className={`score-val score-you`}>{score.you}</div>
+        </div>
+        <div className="score-box">
+          <div className="score-label">DRAW</div>
+          <div className={`score-val score-draw`}>{score.draw}</div>
+        </div>
+        <div className="score-box">
+          <div className="score-label">BOT</div>
+          <div className={`score-val score-bot`}>{score.bot}</div>
+        </div>
+      </div>
+
+      {/* Players display */}
+      <div className="players-display">
+        <div className={`player-slot ${!winner && turn==="X" && !thinking ? "active-turn" : ""}`}>
+          <div className="player-symbol x-symbol">X</div>
+          <div className="pname you">{player.display_name} (you)</div>
+        </div>
+        <div className="vs-divider">VS</div>
+        <div className={`player-slot ${!winner && turn==="O" ? "active-turn" : ""}`}>
+          <div className={`player-symbol ${diffClass[difficulty]}`}>🤖</div>
+          <div className="pname" style={{color:"var(--accent2)"}}>BOT [{diffLabels[difficulty]}]</div>
+        </div>
+      </div>
+
+      {/* Board */}
+      <div className="board-wrap">
+        <div className="board">
+          {board.map((cell,i) => (
+            <div
+              key={i}
+              className={`cell ${cell?"filled":""} ${winLine.includes(i)?"win-cell":""} ${!cell&&isMyTurn?"":"no-hover"}`}
+              onClick={()=>handleCell(i)}
+            >
+              <div className="cell-inner">
+                {cell && <span key={cell+i} className={`cell-value ${cell==="X"?"cell-x":"cell-o"}`}>{cell}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {winLine.length===3 && (
+          <svg className="win-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line className="win-line-path"
+              x1={cellCenter(winLine[0]).x} y1={cellCenter(winLine[0]).y}
+              x2={cellCenter(winLine[2]).x} y2={cellCenter(winLine[2]).y}
+            />
+          </svg>
+        )}
+
+        {confettiPieces.map(p=>(
+          <div key={p.id} className="confetti-piece" style={{
+            background:p.color, left:p.left, top:p.top,
+            '--cx':p.cx, '--cy':p.cy, '--cr':p.cr,
+            animationDelay:p.delay, animationDuration:'0.9s',
+            borderRadius:p.id%3===0?'50%':p.id%3===1?'2px':'0',
+          }}/>
+        ))}
+      </div>
+
+      <div className={`status-bar ${isMyTurn?"your-turn-bar":""}`}>
+        <div key={sMsg} className={`status-text ${sClass}`}>{sMsg}</div>
+      </div>
+
+      <div className="game-buttons">
+        {winner && <button className="btn btn-secondary" onClick={resetGame}>PLAY AGAIN</button>}
+        <button className="btn btn-danger" onClick={onLeave}>← LOBBY</button>
+      </div>
+    </div>
+  );
+}
 
 function useToast() {
   const [toasts, setToasts] = useState([]);
@@ -361,7 +679,7 @@ function AuthScreen({ onAuth }) {
   );
 }
 
-function Lobby({ player, onJoinRoom, onLogout, toast }) {
+function Lobby({ player, onJoinRoom, onBotGame, onLogout, toast }) {
   const [rooms, setRooms]       = useState([]);
   const [tab, setTab]           = useState("all");
   const [newName, setNewName]   = useState("");
@@ -462,6 +780,17 @@ function Lobby({ player, onJoinRoom, onLogout, toast }) {
             <span style={{fontSize:"0.78rem"}}>{player.display_name}</span>
           </div>
           <button className="btn btn-secondary btn-sm" onClick={async()=>{await DB.auth.signOut();onLogout();}}>LOGOUT</button>
+        </div>
+      </div>
+      <div className="bot-banner">
+        <div className="bot-banner-text">
+          <div className="bot-banner-title">⚡ PLAY VS BOT</div>
+          <div className="bot-banner-sub">SOLO · NO OPPONENT NEEDED · 3 DIFFICULTIES</div>
+        </div>
+        <div className="bot-diff-btns">
+          <button className="btn-diff btn-easy"   onClick={()=>onBotGame("easy")}>EASY</button>
+          <button className="btn-diff btn-medium" onClick={()=>onBotGame("medium")}>MEDIUM</button>
+          <button className="btn-diff btn-hard"   onClick={()=>onBotGame("hard")}>HARD</button>
         </div>
       </div>
       <div className="create-room-bar">
@@ -715,9 +1044,10 @@ function GameRoom({ roomId, player, role, onLeave, toast }) {
 }
 
 function App() {
-  const [screen, setScreen]     = useState("loading");
-  const [player, setPlayer]     = useState(null);
-  const [gameInfo, setGameInfo] = useState(null);
+  const [screen, setScreen]       = useState("loading");
+  const [player, setPlayer]       = useState(null);
+  const [gameInfo, setGameInfo]   = useState(null);
+  const [botDiff, setBotDiff]     = useState(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -743,7 +1073,7 @@ function App() {
 
     // FIX 2: Only listen for SIGNED_OUT to handle logout across tabs
     const { data: { subscription } } = DB.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") { setPlayer(null); setGameInfo(null); setScreen("auth"); }
+      if (event === "SIGNED_OUT") { setPlayer(null); setGameInfo(null); setBotDiff(null); setScreen("auth"); }
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -763,12 +1093,17 @@ function App() {
       {screen==="lobby" && player && (
         <Lobby player={player}
           onJoinRoom={(id,role)=>{ setGameInfo({roomId:id,role}); setScreen("game"); }}
-          onLogout={()=>{ setPlayer(null); setGameInfo(null); setScreen("auth"); }}
+          onBotGame={(diff)=>{ setBotDiff(diff); setScreen("bot"); }}
+          onLogout={()=>{ setPlayer(null); setGameInfo(null); setBotDiff(null); setScreen("auth"); }}
           toast={toast} />
       )}
       {screen==="game" && player && gameInfo && (
         <GameRoom roomId={gameInfo.roomId} player={player} role={gameInfo.role}
           onLeave={()=>setScreen("lobby")} toast={toast} />
+      )}
+      {screen==="bot" && player && botDiff && (
+        <BotGame player={player} difficulty={botDiff}
+          onLeave={()=>setScreen("lobby")} />
       )}
       <Toasts toasts={toast.toasts} />
       <footer className="site-footer">MADE BY <a href="https://github.com/Harshit-code07" target="_blank" rel="noopener noreferrer">HARSHIT</a></footer>
