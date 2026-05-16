@@ -17,79 +17,61 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #f4f3ef;
-      --surface:  #ffffff;
-      --surface2: #eceae4;
-      --border:   #d5d2c8;
-      --border2:  #bfbcb2;
-      --accent:   #1a7a4a;
-      --accent-hover: #158040;
-      --accent2:  #d93a5f;
-      --text:     #1c1c1c;
-      --muted:    #7a786e;
-      --x-color:  #d93a5f;
-      --o-color:  #1565c0;
-      --win-bg:   rgba(26,122,74,0.08);
-      --shadow:   0 2px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
-      --font-display: 'Bebas Neue', sans-serif;
-      --font-body:    'Space Mono', monospace;
+      --bg:        #f4f3ef;
+      --surface:   #ffffff;
+      --surface2:  #eceae4;
+      --border:    #d5d2c8;
+      --border2:   #bfbcb2;
+      --accent:    #1a7a4a;
+      --accenthov: #158040;
+      --accent2:   #d93a5f;
+      --text:      #1c1c1c;
+      --muted:     #7a786e;
+      --x-color:   #d93a5f;
+      --o-color:   #1565c0;
+      --win-bg:    rgba(26,122,74,0.08);
+      --sh:        0 2px 12px rgba(0,0,0,0.08);
+      --shlg:      0 4px 24px rgba(0,0,0,0.12);
+      --fd:        'Bebas Neue', sans-serif;
+      --fb:        'Space Mono', monospace;
     }
 
     html, body, #root { height: 100%; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-body); }
+    body { background: var(--bg); color: var(--text); font-family: var(--fb); }
 
     .app {
-      min-height: 100vh; display: flex; flex-direction: column;
-      background: var(--bg);
-      background-image:
-        radial-gradient(ellipse at 15% 10%, rgba(26,122,74,0.06) 0%, transparent 50%),
+      min-height: 100vh; display: flex; flex-direction: column; background: var(--bg);
+      background-image: radial-gradient(ellipse at 15% 10%, rgba(26,122,74,0.06) 0%, transparent 50%),
         radial-gradient(ellipse at 85% 85%, rgba(217,58,95,0.05) 0%, transparent 50%);
     }
 
-    /* ── AUTH ── */
+    /* AUTH */
     .auth-screen { flex:1; display:flex; align-items:center; justify-content:center; padding:2rem; }
     .auth-card {
       background:var(--surface); border:1px solid var(--border); border-radius:4px;
-      padding:3rem; width:100%; max-width:420px; position:relative; overflow:hidden;
-      box-shadow: var(--shadow-lg);
+      padding:3rem; width:100%; max-width:420px; position:relative; overflow:hidden; box-shadow:var(--shlg);
     }
-    .auth-card::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:3px;
-      background:linear-gradient(90deg,var(--accent),var(--o-color));
-    }
-    .logo {
-      font-family:var(--font-display); font-size:4.5rem; letter-spacing:0.05em; line-height:1; margin-bottom:0.2rem;
-      background:linear-gradient(135deg, var(--accent) 0%, var(--o-color) 60%, var(--accent2) 100%);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
+    .auth-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--o-color)); }
+    .logo { font-family:var(--fd); font-size:4.5rem; letter-spacing:0.05em; line-height:1; margin-bottom:0.2rem;
+      background:linear-gradient(135deg,var(--accent) 0%,var(--o-color) 60%,var(--accent2) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .logo-sub { font-size:0.6rem; letter-spacing:0.35em; color:var(--muted); text-transform:uppercase; margin-bottom:2.5rem; }
-
     .auth-tabs { display:flex; margin-bottom:2rem; border-bottom:1px solid var(--border); }
-    .auth-tab {
-      font-family:var(--font-body); font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase;
+    .auth-tab { font-family:var(--fb); font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase;
       background:none; border:none; border-bottom:2px solid transparent; color:var(--muted);
-      cursor:pointer; padding:0.6rem 1.25rem; margin-bottom:-1px; transition:all 0.2s; flex:1; text-align:center;
-    }
+      cursor:pointer; padding:0.6rem 1.25rem; margin-bottom:-1px; transition:all 0.2s; flex:1; text-align:center; }
     .auth-tab:hover { color:var(--text); }
     .auth-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
-
     .field-label { font-size:0.62rem; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:0.45rem; display:block; }
     .field-group { margin-bottom:1.1rem; }
-    input.field {
-      width:100%; background:var(--bg); border:1px solid var(--border); border-radius:3px;
-      color:var(--text); font-family:var(--font-body); font-size:0.85rem;
-      padding:0.7rem 1rem; outline:none; transition:border-color 0.2s;
-    }
-    input.field:focus { border-color:var(--accent); box-shadow: 0 0 0 3px rgba(26,122,74,0.1); }
-
-    .btn {
-      font-family:var(--font-body); font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase;
-      border:none; border-radius:3px; padding:0.75rem 1.5rem; cursor:pointer; transition:all 0.15s; white-space:nowrap;
-    }
+    input.field { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:3px;
+      color:var(--text); font-family:var(--fb); font-size:0.85rem; padding:0.7rem 1rem; outline:none; transition:border-color 0.2s; }
+    input.field:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(26,122,74,0.1); }
+    .btn { font-family:var(--fb); font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase;
+      border:none; border-radius:3px; padding:0.75rem 1.5rem; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
     .btn-primary { background:var(--accent); color:#fff; font-weight:700; }
-    .btn-primary:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow: var(--shadow); }
-    .btn-primary:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+    .btn-primary:hover { background:var(--accenthov); transform:translateY(-1px); box-shadow:var(--sh); }
+    .btn-primary:disabled { opacity:0.45; cursor:not-allowed; transform:none; box-shadow:none; }
     .btn-secondary { background:var(--surface); color:var(--text); border:1px solid var(--border); }
     .btn-secondary:hover { border-color:var(--accent); color:var(--accent); background:rgba(26,122,74,0.04); }
     .btn-danger { background:transparent; color:var(--accent2); border:1px solid var(--accent2); }
@@ -97,61 +79,39 @@
     .btn-sm { padding:0.38rem 0.75rem; font-size:0.67rem; }
     .btn-icon { background:none; border:none; cursor:pointer; color:var(--muted); font-size:0.95rem; padding:0.25rem; transition:color 0.15s; line-height:1; }
     .btn-icon:hover { color:var(--accent2); }
+    .error-box { background:rgba(217,58,95,0.06); border:1px solid rgba(217,58,95,0.3); border-radius:3px;
+      color:var(--accent2); font-size:0.72rem; padding:0.6rem 0.85rem; margin-bottom:1rem; letter-spacing:0.03em; }
+    .divider { display:flex; align-items:center; gap:1rem; margin:1.25rem 0; color:var(--muted); font-size:0.68rem; letter-spacing:0.15em; }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
 
-    .error-box {
-      background:rgba(217,58,95,0.06); border:1px solid rgba(217,58,95,0.3); border-radius:3px;
-      color:var(--accent2); font-size:0.72rem; padding:0.6rem 0.85rem; margin-bottom:1rem; letter-spacing:0.03em;
-    }
-
-    /* ── LOBBY ── */
+    /* LOBBY */
     .lobby { flex:1; display:flex; flex-direction:column; max-width:880px; width:100%; margin:0 auto; padding:1.5rem; }
-    .lobby-header {
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);
-      flex-wrap:wrap; gap:0.75rem;
-    }
-    .lobby-title { font-family:var(--font-display); font-size:2.5rem; letter-spacing:0.05em; color:var(--accent); }
+    .lobby-header { display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:0.75rem; }
+    .lobby-title { font-family:var(--fd); font-size:2.5rem; letter-spacing:0.05em; color:var(--accent); }
     .player-badge { display:flex; align-items:center; gap:0.75rem; }
-    .player-badge-inner {
-      display:flex; align-items:center; gap:0.6rem;
-      background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:0.45rem 0.9rem;
-      box-shadow: var(--shadow);
-    }
+    .player-badge-inner { display:flex; align-items:center; gap:0.6rem;
+      background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:0.45rem 0.9rem; box-shadow:var(--sh); }
     .player-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; flex-shrink:0; }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
-
     .create-room-bar { display:flex; gap:0.75rem; align-items:center; margin-bottom:1.25rem; }
-
-    /* ── TABS ── */
     .tabs { display:flex; margin-bottom:1rem; border-bottom:1px solid var(--border); overflow-x:auto; }
-    .tab {
-      font-family:var(--font-body); font-size:0.67rem; letter-spacing:0.12em; text-transform:uppercase;
+    .tab { font-family:var(--fb); font-size:0.67rem; letter-spacing:0.12em; text-transform:uppercase;
       background:none; border:none; border-bottom:2px solid transparent; color:var(--muted);
       cursor:pointer; padding:0.7rem 1rem; margin-bottom:-1px; transition:all 0.2s;
-      display:flex; align-items:center; gap:0.45rem; white-space:nowrap; flex-shrink:0;
-    }
+      display:flex; align-items:center; gap:0.45rem; white-space:nowrap; flex-shrink:0; }
     .tab:hover { color:var(--text); }
     .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
-    .tab-badge {
-      background:var(--surface2); border-radius:10px; font-size:0.62rem;
-      padding:0.1rem 0.4rem; min-width:1.1rem; text-align:center; color:var(--muted);
-    }
+    .tab-badge { background:var(--surface2); border-radius:10px; font-size:0.62rem; padding:0.1rem 0.4rem; min-width:1.1rem; text-align:center; color:var(--muted); }
     .tab.active .tab-badge { background:rgba(26,122,74,0.12); color:var(--accent); }
-
-    /* ── ROOM LIST ── */
     .rooms-list { display:flex; flex-direction:column; gap:0.45rem; }
-    .room-card {
-      background:var(--surface); border:1px solid var(--border); border-radius:3px;
+    .room-card { background:var(--surface); border:1px solid var(--border); border-radius:3px;
       padding:0.9rem 1.1rem; display:flex; align-items:center; gap:0.9rem;
-      transition:border-color 0.2s, box-shadow 0.2s; position:relative; overflow:hidden;
-      box-shadow: var(--shadow);
-    }
-    .room-card:hover { border-color:rgba(26,122,74,0.3); box-shadow: var(--shadow-lg); }
-    .room-card.is-mine { border-color:rgba(26,122,74,0.25); }
-    .room-card.is-mine::before { content:''; position:absolute; left:0;top:0;bottom:0; width:3px; background:var(--accent); }
-    .room-card.ready::before { content:''; position:absolute; left:0;top:0;bottom:0; width:3px; background:var(--accent); }
+      transition:border-color 0.2s, box-shadow 0.2s; position:relative; overflow:hidden; box-shadow:var(--sh); }
+    .room-card:hover { border-color:rgba(26,122,74,0.3); box-shadow:var(--shlg); }
+    .room-card.is-mine::before,.room-card.ready::before { content:''; position:absolute; left:0;top:0;bottom:0; width:3px; background:var(--accent); }
     .room-card.inactive::before { content:''; position:absolute; left:0;top:0;bottom:0; width:3px; background:var(--border2); }
-    .room-id { font-family:var(--font-display); font-size:1.4rem; letter-spacing:0.12em; color:var(--accent); min-width:3.5rem; }
+    .room-id { font-family:var(--fd); font-size:1.4rem; letter-spacing:0.12em; color:var(--accent); min-width:3.5rem; }
     .room-info { flex:1; min-width:0; }
     .room-name { font-size:0.82rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .room-meta { font-size:0.67rem; color:var(--muted); letter-spacing:0.04em; margin-top:0.18rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -161,160 +121,106 @@
     .s-playing  { color:var(--o-color); border-color:rgba(21,101,192,0.35); background:rgba(21,101,192,0.06); }
     .s-mine     { color:#b06f00; border-color:rgba(176,111,0,0.35); background:rgba(176,111,0,0.07); }
     .room-actions { display:flex; gap:0.4rem; align-items:center; flex-shrink:0; }
-
     .empty-state { text-align:center; padding:3rem 1rem; color:var(--muted); font-size:0.75rem; letter-spacing:0.12em; }
     .empty-icon  { font-size:2.5rem; margin-bottom:0.75rem; opacity:0.3; }
 
-    /* ── GAME ── */
+    /* GAME */
     .game-room { flex:1; display:flex; flex-direction:column; align-items:center; padding:1.5rem; }
     .game-header { width:100%; max-width:520px; display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
-    .room-code { font-family:var(--font-display); font-size:1.7rem; letter-spacing:0.1em; color:var(--muted); }
+    .room-code { font-family:var(--fd); font-size:1.7rem; letter-spacing:0.1em; color:var(--muted); }
     .room-code span { color:var(--accent); }
-    .players-display {
-      width:100%; max-width:520px; display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:1.25rem; background:var(--surface); border:1px solid var(--border); border-radius:3px;
-      padding:0.9rem 1.25rem; box-shadow: var(--shadow);
-    }
+    .players-display { width:100%; max-width:520px; display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:1.25rem; background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:0.9rem 1.25rem; box-shadow:var(--sh); }
     .player-slot { display:flex; flex-direction:column; align-items:center; gap:0.2rem; min-width:100px; }
-    .player-symbol { font-family:var(--font-display); font-size:2.5rem; line-height:1; }
+    .player-symbol { font-family:var(--fd); font-size:2.5rem; line-height:1; }
     .x-symbol { color:var(--x-color); }
     .o-symbol { color:var(--o-color); }
     .pname { font-size:0.73rem; letter-spacing:0.04em; color:var(--text); max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .pname.you { color:var(--accent); font-weight:700; }
     .pname.waiting { color:var(--muted); font-style:italic; }
-    .vs-divider { font-family:var(--font-display); font-size:1.4rem; color:var(--border2); letter-spacing:0.1em; }
-
-    /* ── BOARD ── */
-    .board {
-      display:grid; grid-template-columns:repeat(3,1fr); gap:6px;
+    .vs-divider { font-family:var(--fd); font-size:1.4rem; color:var(--border2); letter-spacing:0.1em; }
+    .board { display:grid; grid-template-columns:repeat(3,1fr); gap:6px;
       background:var(--border); padding:6px; border-radius:6px;
-      width:min(80vw,340px); height:min(80vw,340px); margin-bottom:1.25rem;
-      box-shadow: var(--shadow-lg);
-    }
-    .cell {
-      background:var(--surface); border-radius:3px; display:flex; align-items:center; justify-content:center;
-      font-family:var(--font-display); font-size:clamp(2.8rem,11vw,4.5rem);
-      cursor:pointer; transition:background 0.12s, box-shadow 0.12s; user-select:none;
-    }
-    .cell:hover:not(.filled) { background:var(--surface2); box-shadow: inset 0 0 0 2px var(--accent); }
+      width:min(80vw,340px); height:min(80vw,340px); margin-bottom:1.25rem; box-shadow:var(--shlg); }
+    .cell { background:var(--surface); border-radius:3px; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:background 0.12s, box-shadow 0.12s; user-select:none; }
+    .cell:hover:not(.filled) { background:var(--surface2); box-shadow:inset 0 0 0 2px var(--accent); }
     .cell.filled { cursor:default; }
-    .cell.win-cell { background:var(--win-bg); box-shadow: inset 0 0 0 2px var(--accent); }
-    .cell-x { color:var(--x-color); text-shadow:0 2px 8px rgba(217,58,95,0.25); }
-    .cell-o { color:var(--o-color); text-shadow:0 2px 8px rgba(21,101,192,0.25); }
+    .cell.win-cell { background:var(--win-bg); box-shadow:inset 0 0 0 2px var(--accent); }
+    .cell-x { color:var(--x-color); font-family:var(--fd); font-size:clamp(2.8rem,11vw,4.5rem); }
+    .cell-o { color:var(--o-color); font-family:var(--fd); font-size:clamp(2.8rem,11vw,4.5rem); }
     @keyframes pop { 0%{transform:scale(0.4);opacity:0} 60%{transform:scale(1.18)} 100%{transform:scale(1);opacity:1} }
     .cell-value { animation:pop 0.2s ease-out forwards; display:block; }
-
-    /* ── STATUS ── */
-    .status-bar {
-      width:100%; max-width:520px; text-align:center; padding:0.7rem;
-      background:var(--surface); border:1px solid var(--border); border-radius:3px;
-      margin-bottom:0.9rem; box-shadow: var(--shadow);
-    }
+    .status-bar { width:100%; max-width:520px; text-align:center; padding:0.7rem;
+      background:var(--surface); border:1px solid var(--border); border-radius:3px; margin-bottom:0.9rem; box-shadow:var(--sh); }
     .status-text { font-size:0.77rem; letter-spacing:0.15em; text-transform:uppercase; }
-    .st-your-turn   { color:var(--accent); }
-    .st-wait        { color:var(--muted); }
-    .st-win         { color:var(--accent); }
-    .st-lose        { color:var(--accent2); }
-    .st-draw        { color:var(--o-color); }
-    .st-waiting-p   { color:var(--muted); }
+    .st-your-turn { color:var(--accent); }
+    .st-wait      { color:var(--muted); }
+    .st-win       { color:var(--accent); }
+    .st-lose      { color:var(--accent2); }
+    .st-draw      { color:var(--o-color); }
+    .st-waiting-p { color:var(--muted); }
     .game-buttons { display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; }
-
-    .waiting-room { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; }
+    .waiting-room { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; gap:1rem; }
     @keyframes spin { to{transform:rotate(360deg)} }
-    .spin { animation:spin 2.5s linear infinite; font-size:2.5rem; display:inline-block; margin-bottom:1rem; color:var(--accent); }
-
-    /* ── SHARE BOX ── */
-    .share-box {
-      max-width:520px; width:100%; margin-bottom:1rem;
-      background:var(--surface); border:1px solid var(--border); border-radius:3px;
-      padding:1rem 1.25rem; text-align:center; box-shadow: var(--shadow);
-    }
+    .spin { animation:spin 2.5s linear infinite; font-size:2.5rem; display:inline-block; color:var(--accent); }
+    .share-box { max-width:520px; width:100%; margin-bottom:1rem;
+      background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:1rem 1.25rem; text-align:center; box-shadow:var(--sh); }
     .share-label { font-size:0.62rem; letter-spacing:0.2em; color:var(--muted); margin-bottom:0.4rem; }
-    .share-code {
-      font-family:var(--font-display); font-size:2.8rem; letter-spacing:0.3em;
-      background:linear-gradient(135deg,var(--accent),var(--o-color));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
+    .share-code { font-family:var(--fd); font-size:2.8rem; letter-spacing:0.3em;
+      background:linear-gradient(135deg,var(--accent),var(--o-color)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .share-hint { font-size:0.62rem; color:var(--muted); letter-spacing:0.15em; cursor:pointer; margin-top:0.25rem; }
     .share-hint:hover { color:var(--accent); }
-
-    /* ── TOASTS ── */
     .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; display:flex; flex-direction:column; gap:0.45rem; z-index:9999; }
-    .toast {
-      background:var(--surface); border:1px solid var(--border); border-radius:3px;
+    .toast { background:var(--surface); border:1px solid var(--border); border-radius:3px;
       padding:0.55rem 1rem; font-size:0.72rem; letter-spacing:0.04em;
-      animation:slideIn 0.25s ease-out; max-width:260px; box-shadow: var(--shadow-lg);
-      color:var(--text);
-    }
+      animation:slideIn 0.25s ease-out; max-width:260px; box-shadow:var(--shlg); color:var(--text); }
     @keyframes slideIn { from{transform:translateX(110%);opacity:0} to{transform:translateX(0);opacity:1} }
-
-    .divider { display:flex; align-items:center; gap:1rem; margin:1.25rem 0; color:var(--muted); font-size:0.68rem; letter-spacing:0.15em; }
-    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
-
-    /* loading overlay */
     .loading-screen { flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1rem; }
-    .loading-logo { font-family:var(--font-display); font-size:3rem; letter-spacing:0.1em; color:var(--muted); }
+    .loading-logo { font-family:var(--fd); font-size:3rem; letter-spacing:0.1em; color:var(--muted); }
   </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
+const { useState, useEffect, useRef } = React;
 const { createClient } = supabase;
 
-// ─── SUPABASE ─────────────────────────────────────────────────────────────
 const DB = createClient(
   "https://xhdvsrpediosbblvbgbo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHZzcnBlZGlvc2JibHZiZ2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NDU2NTgsImV4cCI6MjA5NDQyMTY1OH0.LNw9DuCD5EBBD0h2Y6UYYkZlUSZbewLk9d8UCje88OM",
-  {
-    auth: {
-      // FIX: persist session in localStorage so refresh doesn't log user out
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: false,
-    }
-  }
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHZzcnBlZGlvc2JibHZiZ2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NDU2NTgsImV4cCI6MjA5NDQyMTY1OH0.LNw9DuCD5EBBD0h2Y6UYYkZlUSZbewLk9d8UCje88OM"
 );
 
-// ─── UTILS ────────────────────────────────────────────────────────────────
 function checkWinner(board) {
   const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   for (const [a,b,c] of lines) {
     if (board[a] && board[a]===board[b] && board[a]===board[c])
-      return { winner:board[a], line:[a,b,c] };
+      return { winner: board[a], line: [a,b,c] };
   }
-  if (board.every(Boolean)) return { winner:"draw", line:[] };
+  if (board.every(Boolean)) return { winner: "draw", line: [] };
   return null;
 }
 function genId() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
 
-// ─── TOAST ────────────────────────────────────────────────────────────────
 function useToast() {
   const [toasts, setToasts] = useState([]);
   const add = msg => {
     const id = Date.now() + Math.random();
-    setToasts(t => [...t, {id, msg}]);
-    setTimeout(() => setToasts(t => t.filter(x => x.id!==id)), 3200);
+    setToasts(t => [...t, { id, msg }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
   };
   return { toasts, add };
 }
 function Toasts({ toasts }) {
-  return (
-    <div className="toast-container">
-      {toasts.map(t => <div key={t.id} className="toast">{t.msg}</div>)}
-    </div>
-  );
+  return <div className="toast-container">{toasts.map(t => <div key={t.id} className="toast">{t.msg}</div>)}</div>;
 }
 
-// ─── AUTH SCREEN ──────────────────────────────────────────────────────────
 function AuthScreen({ onAuth }) {
   const [mode, setMode]         = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState("");
-
   const toEmail = u => `${u.toLowerCase().trim()}@xo.game`;
 
   async function handleSignup() {
@@ -322,15 +228,13 @@ function AuthScreen({ onAuth }) {
     const u = username.trim();
     if (!u || u.length < 3) { setError("Username must be at least 3 characters."); setLoading(false); return; }
     if (!/^[a-zA-Z0-9_]+$/.test(u)) { setError("Only letters, numbers, underscores."); setLoading(false); return; }
-    if (password.length < 6)  { setError("Password must be at least 6 characters."); setLoading(false); return; }
-
+    if (password.length < 6) { setError("Password must be at least 6 characters."); setLoading(false); return; }
     const { data: existing } = await DB.from("profiles").select("id").eq("username", u.toLowerCase()).maybeSingle();
-    if (existing) { setError("Username already taken. Try another."); setLoading(false); return; }
-
-    const { data, error: signErr } = await DB.auth.signUp({ email: toEmail(u), password });
-    if (signErr) { setError(signErr.message); setLoading(false); return; }
-
-    await DB.from("profiles").insert({ id: data.user.id, username: u.toLowerCase(), display_name: u });
+    if (existing) { setError("Username already taken."); setLoading(false); return; }
+    const { data, error: err } = await DB.auth.signUp({ email: toEmail(u), password });
+    if (err) { setError(err.message); setLoading(false); return; }
+    const { error: pErr } = await DB.from("profiles").insert({ id: data.user.id, username: u.toLowerCase(), display_name: u });
+    if (pErr) { setError("Profile save failed: " + pErr.message); setLoading(false); return; }
     onAuth({ id: data.user.id, username: u.toLowerCase(), display_name: u });
   }
 
@@ -338,48 +242,42 @@ function AuthScreen({ onAuth }) {
     setError(""); setLoading(true);
     const u = username.trim();
     if (!u || !password) { setError("Please fill in all fields."); setLoading(false); return; }
-
-    const { data, error: loginErr } = await DB.auth.signInWithPassword({ email: toEmail(u), password });
-    if (loginErr) { setError("Invalid username or password."); setLoading(false); return; }
-
+    const { data, error: err } = await DB.auth.signInWithPassword({ email: toEmail(u), password });
+    if (err) { setError("Invalid username or password."); setLoading(false); return; }
     const { data: profile } = await DB.from("profiles").select("*").eq("id", data.user.id).single();
     onAuth({ id: data.user.id, username: profile?.username || u.toLowerCase(), display_name: profile?.display_name || u });
   }
 
-  function handleKey(e) { if (e.key==="Enter") mode==="login" ? handleLogin() : handleSignup(); }
+  const onKey = e => { if (e.key === "Enter") mode === "login" ? handleLogin() : handleSignup(); };
 
   return (
     <div className="auth-screen">
       <div className="auth-card">
         <div className="logo">X ✕ O</div>
         <div className="logo-sub">MULTIPLAYER · REALTIME · SUPABASE</div>
-
         <div className="auth-tabs">
           <button className={`auth-tab ${mode==="login"?"active":""}`} onClick={()=>{setMode("login");setError("");}}>LOGIN</button>
           <button className={`auth-tab ${mode==="signup"?"active":""}`} onClick={()=>{setMode("signup");setError("");}}>SIGN UP</button>
         </div>
-
         {error && <div className="error-box">{error}</div>}
-
         <div className="field-group">
           <label className="field-label">Username</label>
           <input className="field" placeholder="e.g. NeonFox" value={username}
-            onChange={e=>setUsername(e.target.value)} onKeyDown={handleKey} autoComplete="username" spellCheck={false}/>
+            onChange={e=>setUsername(e.target.value)} onKeyDown={onKey} autoComplete="username" spellCheck={false} autoFocus />
         </div>
         <div className="field-group">
           <label className="field-label">Password</label>
           <input className="field" type="password" placeholder="••••••••" value={password}
-            onChange={e=>setPassword(e.target.value)} onKeyDown={handleKey} autoComplete={mode==="login"?"current-password":"new-password"}/>
+            onChange={e=>setPassword(e.target.value)} onKeyDown={onKey}
+            autoComplete={mode==="login"?"current-password":"new-password"} />
         </div>
-
         <button className="btn btn-primary" style={{width:"100%",marginTop:"0.5rem"}}
           onClick={mode==="login" ? handleLogin : handleSignup} disabled={loading}>
           {loading ? "…" : mode==="login" ? "LOGIN" : "CREATE ACCOUNT"}
         </button>
-
         <div className="divider">{mode==="login" ? "NO ACCOUNT?" : "HAVE AN ACCOUNT?"}</div>
         <button className="btn btn-secondary" style={{width:"100%"}}
-          onClick={()=>{setMode(mode==="login"?"signup":"login");setError("");}}>
+          onClick={()=>{ setMode(mode==="login"?"signup":"login"); setError(""); }}>
           {mode==="login" ? "SIGN UP" : "LOGIN"}
         </button>
       </div>
@@ -387,105 +285,92 @@ function AuthScreen({ onAuth }) {
   );
 }
 
-// ─── LOBBY ────────────────────────────────────────────────────────────────
 function Lobby({ player, onJoinRoom, onLogout, toast }) {
   const [rooms, setRooms]       = useState([]);
   const [tab, setTab]           = useState("all");
   const [newName, setNewName]   = useState("");
   const [creating, setCreating] = useState(false);
+  const subRef = useRef(null);
 
   useEffect(() => {
-    let sub;
-    async function init() {
-      const { data } = await DB.from("rooms").select("*").order("created_at", { ascending: false });
-      setRooms(data || []);
+    DB.from("rooms").select("*").order("created_at", { ascending: false })
+      .then(({ data }) => setRooms(data || []));
 
-      // FIX: use a unique channel name per session to avoid stale subscriptions
-      sub = DB.channel("rooms-lobby-" + Date.now())
-        .on("postgres_changes", { event:"*", schema:"public", table:"rooms" }, payload => {
-          setRooms(prev => {
-            if (payload.eventType==="INSERT") return [payload.new, ...prev];
-            if (payload.eventType==="DELETE") return prev.filter(r => r.id!==payload.old.id);
-            if (payload.eventType==="UPDATE") return prev.map(r => r.id===payload.new.id ? payload.new : r);
-            return prev;
-          });
-        })
-        .subscribe(status => {
-          // FIX: if subscription drops, re-fetch to avoid stale state
-          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-            DB.from("rooms").select("*").order("created_at", { ascending: false })
-              .then(({ data }) => { if (data) setRooms(data); });
-          }
-        });
-    }
-    init();
-    return () => { sub && DB.removeChannel(sub); };
+    subRef.current = DB.channel("lobby-" + Date.now())
+      .on("postgres_changes", { event: "*", schema: "public", table: "rooms" }, payload => {
+        if (payload.eventType === "INSERT")
+          setRooms(prev => [payload.new, ...prev]);
+        else if (payload.eventType === "DELETE")
+          setRooms(prev => prev.filter(r => r.id !== payload.old.id));
+        else if (payload.eventType === "UPDATE")
+          setRooms(prev => prev.map(r => r.id === payload.new.id ? payload.new : r));
+      })
+      .subscribe();
+
+    return () => { if (subRef.current) DB.removeChannel(subRef.current); };
   }, []);
 
   async function createRoom() {
+    if (creating) return;
     setCreating(true);
-    const id = genId();
-    const { error } = await DB.from("rooms").insert({
-      id, name: newName.trim() || `${player.display_name}'s Room`,
-      host_id: player.id, host_name: player.display_name,
-      guest_id: null, guest_name: null,
-      board: Array(9).fill(null),
-      current_turn: "X", winner: null, status: "inactive"
-    });
-    setCreating(false);
-    if (error) { toast.add("❌ Failed to create room"); return; }
-    setNewName("");
-    onJoinRoom(id, "host");
+    try {
+      const id = genId();
+      const { error } = await DB.from("rooms").insert({
+        id,
+        name: newName.trim() || (player.display_name + "'s Room"),
+        host_id: player.id,
+        host_name: player.display_name,
+        guest_id: null,
+        guest_name: null,
+        board: [null,null,null,null,null,null,null,null,null],
+        current_turn: "X",
+        winner: null,
+        status: "waiting"
+      });
+      if (error) { toast.add("Error: " + error.message); return; }
+      setNewName("");
+      onJoinRoom(id, "host");
+    } catch(e) {
+      toast.add("Unexpected error: " + e.message);
+    } finally {
+      setCreating(false);
+    }
   }
 
   async function joinRoom(room) {
     if (room.guest_id) { toast.add("Room is full"); return; }
-    const { error } = await DB.from("rooms").update({
-      guest_id: player.id, guest_name: player.display_name, status: "playing"
-    }).eq("id", room.id);
-    if (error) { toast.add("❌ Failed to join"); return; }
+    const { error } = await DB.from("rooms")
+      .update({ guest_id: player.id, guest_name: player.display_name, status: "playing" })
+      .eq("id", room.id);
+    if (error) { toast.add("Join failed: " + error.message); return; }
     onJoinRoom(room.id, "guest");
   }
 
   async function deleteRoom(room) {
-    if (room.host_id !== player.id) { toast.add("Only the host can delete this room"); return; }
-    await DB.from("rooms").delete().eq("id", room.id);
-    toast.add("🗑 Room deleted");
+    if (room.host_id !== player.id) { toast.add("Only the host can delete"); return; }
+    const { error } = await DB.from("rooms").delete().eq("id", room.id);
+    if (!error) toast.add("Room deleted");
   }
 
-  async function handleLogout() {
-    await DB.auth.signOut();
-    onLogout();
-  }
-
-  const myRooms       = rooms.filter(r => r.host_id===player.id);
-  const readyRooms    = rooms.filter(r => !r.guest_id && !r.winner && r.host_id!==player.id);
-  const inactiveRooms = rooms.filter(r => r.winner || (r.guest_id && r.status!=="playing"));
-  const displayRooms  =
-    tab==="all"      ? rooms :
-    tab==="ready"    ? readyRooms :
-    tab==="inactive" ? inactiveRooms :
-    myRooms;
+  const myRooms       = rooms.filter(r => r.host_id === player.id);
+  const readyRooms    = rooms.filter(r => !r.guest_id && !r.winner && r.host_id !== player.id);
+  const inactiveRooms = rooms.filter(r => r.winner || (r.guest_id && r.status !== "playing"));
+  const displayRooms  = tab==="all" ? rooms : tab==="ready" ? readyRooms : tab==="inactive" ? inactiveRooms : myRooms;
 
   function StatusPill({ room }) {
-    if (room.host_id===player.id)
-      return <span className="room-status s-mine">YOUR ROOM</span>;
-    if (room.winner)
-      return <span className="room-status s-inactive">FINISHED</span>;
-    if (!room.guest_id)
-      return <span className="room-status s-ready">WAITING</span>;
+    if (room.host_id === player.id) return <span className="room-status s-mine">YOUR ROOM</span>;
+    if (room.winner)                return <span className="room-status s-inactive">FINISHED</span>;
+    if (!room.guest_id)             return <span className="room-status s-ready">WAITING</span>;
     return <span className="room-status s-playing">IN GAME</span>;
   }
 
   function RoomActions({ room }) {
-    const isHost  = room.host_id===player.id;
-    const isGuest = room.guest_id===player.id;
-    if (isHost) return (
-      <>
-        <button className="btn btn-secondary btn-sm" onClick={()=>onJoinRoom(room.id,"host")}>OPEN</button>
-        <button className="btn-icon" title="Delete room" onClick={()=>deleteRoom(room)}>🗑</button>
-      </>
-    );
+    const isHost  = room.host_id === player.id;
+    const isGuest = room.guest_id === player.id;
+    if (isHost) return (<>
+      <button className="btn btn-secondary btn-sm" onClick={()=>onJoinRoom(room.id,"host")}>OPEN</button>
+      <button className="btn-icon" title="Delete" onClick={()=>deleteRoom(room)}>🗑</button>
+    </>);
     if (isGuest) return <button className="btn btn-secondary btn-sm" onClick={()=>onJoinRoom(room.id,"guest")}>REJOIN</button>;
     if (!room.guest_id && !room.winner) return <button className="btn btn-primary btn-sm" onClick={()=>joinRoom(room)}>JOIN</button>;
     return <span style={{fontSize:"0.65rem",color:"var(--muted)"}}>FULL</span>;
@@ -497,34 +382,32 @@ function Lobby({ player, onJoinRoom, onLogout, toast }) {
         <div className="lobby-title">LOBBY</div>
         <div className="player-badge">
           <div className="player-badge-inner">
-            <div className="player-dot"/>
+            <div className="player-dot" />
             <span style={{fontSize:"0.78rem"}}>{player.display_name}</span>
           </div>
-          <button className="btn btn-secondary btn-sm" onClick={handleLogout}>LOGOUT</button>
+          <button className="btn btn-secondary btn-sm" onClick={async()=>{await DB.auth.signOut();onLogout();}}>LOGOUT</button>
         </div>
       </div>
-
       <div className="create-room-bar">
         <input className="field" style={{flex:1}} placeholder="Room name (optional)…"
-          value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&createRoom()}/>
+          value={newName} onChange={e=>setNewName(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&createRoom()} />
         <button className="btn btn-primary" onClick={createRoom} disabled={creating}>
-          {creating ? "…" : "+ CREATE ROOM"}
+          {creating ? "CREATING…" : "+ CREATE ROOM"}
         </button>
       </div>
-
       <div className="tabs">
         {[
-          { k:"all",      label:"All Rooms",     count: rooms.length },
-          { k:"ready",    label:"Ready to Play", count: readyRooms.length },
-          { k:"inactive", label:"Inactive",       count: inactiveRooms.length },
-          { k:"mine",     label:"Your Rooms",    count: myRooms.length },
-        ].map(t => (
+          {k:"all",      label:"All Rooms",     count:rooms.length},
+          {k:"ready",    label:"Ready to Play", count:readyRooms.length},
+          {k:"inactive", label:"Inactive",       count:inactiveRooms.length},
+          {k:"mine",     label:"Your Rooms",    count:myRooms.length},
+        ].map(t=>(
           <button key={t.k} className={`tab ${tab===t.k?"active":""}`} onClick={()=>setTab(t.k)}>
             {t.label} <span className="tab-badge">{t.count}</span>
           </button>
         ))}
       </div>
-
       <div className="rooms-list">
         {displayRooms.length===0 ? (
           <div className="empty-state">
@@ -534,17 +417,15 @@ function Lobby({ player, onJoinRoom, onLogout, toast }) {
               {tab==="mine" ? "Hit + CREATE ROOM to start" : "Check another tab or create one"}
             </div>
           </div>
-        ) : displayRooms.map(room => (
+        ) : displayRooms.map(room=>(
           <div key={room.id} className={`room-card ${room.host_id===player.id?"is-mine":!room.guest_id&&!room.winner?"ready":"inactive"}`}>
             <div className="room-id">{room.id}</div>
             <div className="room-info">
               <div className="room-name">{room.name}</div>
-              <div className="room-meta">
-                {room.host_name}{room.guest_name ? ` vs ${room.guest_name}` : " · waiting for opponent"}
-              </div>
+              <div className="room-meta">{room.host_name}{room.guest_name?` vs ${room.guest_name}`:" · waiting for opponent"}</div>
             </div>
-            <StatusPill room={room}/>
-            <div className="room-actions"><RoomActions room={room}/></div>
+            <StatusPill room={room} />
+            <div className="room-actions"><RoomActions room={room} /></div>
           </div>
         ))}
       </div>
@@ -552,65 +433,56 @@ function Lobby({ player, onJoinRoom, onLogout, toast }) {
   );
 }
 
-// ─── GAME ROOM ────────────────────────────────────────────────────────────
 function GameRoom({ roomId, player, role, onLeave, toast }) {
   const [room, setRoom] = useState(null);
   const subRef = useRef(null);
-  const roomRef = useRef(null); // FIX: keep a ref to latest room for realtime handler
 
   useEffect(() => {
-    roomRef.current = room;
-  }, [room]);
+    let active = true;
 
-  useEffect(() => {
-    let mounted = true;
+    DB.from("rooms").select("*").eq("id", roomId).single().then(({ data, error }) => {
+      if (!active) return;
+      if (error || !data) { toast.add("Room not found"); onLeave(); return; }
+      setRoom(data);
+    });
 
-    async function init() {
-      // Initial fetch
-      const { data } = await DB.from("rooms").select("*").eq("id", roomId).single();
-      if (mounted) setRoom(data);
+    subRef.current = DB.channel("game-" + roomId + "-" + Date.now())
+      .on("postgres_changes",
+        { event: "UPDATE", schema: "public", table: "rooms", filter: `id=eq.${roomId}` },
+        payload => { if (active) setRoom(payload.new); }
+      )
+      .on("postgres_changes",
+        { event: "DELETE", schema: "public", table: "rooms", filter: `id=eq.${roomId}` },
+        () => { if (active) { toast.add("Room was deleted"); onLeave(); } }
+      )
+      .subscribe(status => {
+        if (status === "SUBSCRIBED" && active) {
+          DB.from("rooms").select("*").eq("id", roomId).single()
+            .then(({ data }) => { if (data && active) setRoom(data); });
+        }
+      });
 
-      // FIX: use unique channel name and handle reconnection
-      subRef.current = DB.channel(`room-${roomId}-${Date.now()}`)
-        .on("postgres_changes", { event:"UPDATE", schema:"public", table:"rooms", filter:`id=eq.${roomId}` },
-          payload => {
-            if (mounted) setRoom(payload.new);
-          })
-        .on("postgres_changes", { event:"DELETE", schema:"public", table:"rooms", filter:`id=eq.${roomId}` },
-          () => {
-            if (mounted) { toast.add("Room was deleted by host"); onLeave(); }
-          })
-        .subscribe(async (status) => {
-          // FIX: re-fetch on reconnect to catch any missed updates
-          if ((status === "SUBSCRIBED") && mounted) {
-            const { data: fresh } = await DB.from("rooms").select("*").eq("id", roomId).single();
-            if (fresh && mounted) setRoom(fresh);
-          }
-        });
-    }
-
-    init();
     return () => {
-      mounted = false;
+      active = false;
       if (subRef.current) DB.removeChannel(subRef.current);
     };
   }, [roomId]);
 
   async function makeMove(idx) {
     if (!room) return;
-    const sym = role==="host" ? "X" : "O";
+    const sym = role === "host" ? "X" : "O";
     if (room.current_turn!==sym || room.board[idx] || room.winner || !room.guest_id) return;
-    const nb = [...room.board]; nb[idx]=sym;
+    const nb = [...room.board]; nb[idx] = sym;
     const res = checkWinner(nb);
     await DB.from("rooms").update({
-      board: nb,
-      current_turn: sym==="X" ? "O" : "X",
-      winner: res ? res.winner : null,
+      board: nb, current_turn: sym==="X"?"O":"X", winner: res ? res.winner : null
     }).eq("id", roomId);
   }
 
   async function resetGame() {
-    await DB.from("rooms").update({ board:Array(9).fill(null), current_turn:"X", winner:null }).eq("id", roomId);
+    await DB.from("rooms").update({
+      board: [null,null,null,null,null,null,null,null,null], current_turn: "X", winner: null
+    }).eq("id", roomId);
   }
 
   async function deleteAndLeave() {
@@ -625,17 +497,17 @@ function GameRoom({ roomId, player, role, onLeave, toast }) {
     </div>
   );
 
-  const sym = role==="host" ? "X" : "O";
-  const res = checkWinner(room.board);
+  const sym     = role === "host" ? "X" : "O";
+  const res     = checkWinner(room.board);
   const winLine = res?.line || [];
-  const isMyTurn = !room.winner && room.guest_id && room.current_turn===sym;
+  const isMyTurn = !room.winner && room.guest_id && room.current_turn === sym;
 
   let sClass="st-wait", sMsg="";
-  if (!room.guest_id)            { sClass="st-waiting-p"; sMsg="WAITING FOR OPPONENT…"; }
-  else if (room.winner==="draw") { sClass="st-draw";      sMsg="IT'S A DRAW"; }
-  else if (room.winner===sym)    { sClass="st-win";       sMsg="YOU WIN! 🏆"; }
-  else if (room.winner)          { sClass="st-lose";      sMsg="YOU LOSE"; }
-  else if (isMyTurn)             { sClass="st-your-turn"; sMsg="YOUR TURN"; }
+  if (!room.guest_id)              { sClass="st-waiting-p"; sMsg="WAITING FOR OPPONENT…"; }
+  else if (room.winner==="draw")   { sClass="st-draw";      sMsg="IT'S A DRAW"; }
+  else if (room.winner===sym)      { sClass="st-win";       sMsg="YOU WIN! 🏆"; }
+  else if (room.winner)            { sClass="st-lose";      sMsg="YOU LOSE"; }
+  else if (isMyTurn)               { sClass="st-your-turn"; sMsg="YOUR TURN"; }
   else { sClass="st-wait"; sMsg=`${room.current_turn==="X"?room.host_name:room.guest_name||"Opponent"}'s TURN`; }
 
   return (
@@ -644,17 +516,13 @@ function GameRoom({ roomId, player, role, onLeave, toast }) {
         <div className="room-code">ROOM <span>{room.id}</span></div>
         <button className="btn btn-secondary btn-sm" onClick={onLeave}>← LOBBY</button>
       </div>
-
       {!room.guest_id && (
         <div className="share-box">
           <div className="share-label">SHARE THIS CODE WITH YOUR OPPONENT</div>
           <div className="share-code">{room.id}</div>
-          <div className="share-hint" onClick={()=>{navigator.clipboard.writeText(room.id);toast.add("📋 Room code copied!");}}>
-            TAP TO COPY
-          </div>
+          <div className="share-hint" onClick={()=>{navigator.clipboard.writeText(room.id);toast.add("📋 Copied!");}}>TAP TO COPY</div>
         </div>
       )}
-
       <div className="players-display">
         <div className="player-slot">
           <div className="player-symbol x-symbol">X</div>
@@ -668,33 +536,24 @@ function GameRoom({ roomId, player, role, onLeave, toast }) {
           </div>
         </div>
       </div>
-
       <div className="board">
         {(room.board||Array(9).fill(null)).map((cell,i) => (
-          <div key={i} className={`cell ${cell?"filled":""} ${winLine.includes(i)?"win-cell":""}`}
-            onClick={()=>makeMove(i)}>
+          <div key={i} className={`cell ${cell?"filled":""} ${winLine.includes(i)?"win-cell":""}`} onClick={()=>makeMove(i)}>
             {cell && <span className={`cell-value ${cell==="X"?"cell-x":"cell-o"}`}>{cell}</span>}
           </div>
         ))}
       </div>
-
       <div className="status-bar">
         <div className={`status-text ${sClass}`}>{sMsg}</div>
       </div>
-
       <div className="game-buttons">
-        {room.winner && role==="host" && (
-          <button className="btn btn-secondary" onClick={resetGame}>PLAY AGAIN</button>
-        )}
-        {role==="host" && (
-          <button className="btn btn-danger" onClick={deleteAndLeave}>DELETE ROOM</button>
-        )}
+        {room.winner && role==="host" && <button className="btn btn-secondary" onClick={resetGame}>PLAY AGAIN</button>}
+        {role==="host" && <button className="btn btn-danger" onClick={deleteAndLeave}>DELETE ROOM</button>}
       </div>
     </div>
   );
 }
 
-// ─── APP ROOT ─────────────────────────────────────────────────────────────
 function App() {
   const [screen, setScreen]     = useState("loading");
   const [player, setPlayer]     = useState(null);
@@ -702,79 +561,61 @@ function App() {
   const toast = useToast();
 
   useEffect(() => {
-    // FIX: listen to onAuthStateChange instead of just a one-time getSession check.
-    // This fires immediately with the restored session (if any) so no re-login needed after refresh.
-    const { data: { subscription } } = DB.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION") {
-        if (session) {
-          // Only fetch profile if we don't already have player data
-          setPlayer(prev => {
-            if (prev && prev.id === session.user.id) return prev; // already set, no-op
-            return null; // will trigger profile fetch below
-          });
-
-          // Fetch profile for the session user
-          const { data: profile } = await DB.from("profiles")
-            .select("*").eq("id", session.user.id).single();
-
-          if (profile) {
-            setPlayer({ id: session.user.id, username: profile.username, display_name: profile.display_name });
-            setScreen(s => s === "loading" || s === "auth" ? "lobby" : s);
-          } else {
-            // No profile yet (very fresh signup handled by AuthScreen), go to auth
-            setScreen("auth");
-          }
+    // FIX 1: Use getSession() on mount — reads the persisted JWT from localStorage
+    // synchronously. This is reliable on page refresh, unlike onAuthStateChange
+    // which has a race condition before the session is restored.
+    async function bootstrap() {
+      try {
+        const { data: { session } } = await DB.auth.getSession();
+        if (!session) { setScreen("auth"); return; }
+        const { data: profile } = await DB.from("profiles").select("*").eq("id", session.user.id).single();
+        if (profile) {
+          setPlayer({ id: session.user.id, username: profile.username, display_name: profile.display_name });
+          setScreen("lobby");
         } else {
-          // No session
-          setPlayer(null);
           setScreen("auth");
         }
-      } else if (event === "SIGNED_OUT") {
-        setPlayer(null);
-        setGameInfo(null);
+      } catch(e) {
         setScreen("auth");
       }
-    });
+    }
+    bootstrap();
 
+    // FIX 2: Only listen for SIGNED_OUT to handle logout across tabs
+    const { data: { subscription } } = DB.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") { setPlayer(null); setGameInfo(null); setScreen("auth"); }
+    });
     return () => subscription.unsubscribe();
   }, []);
 
-  function handleAuth(playerData) {
-    setPlayer(playerData);
-    setScreen("lobby");
-  }
-
-  function handleLogout() {
-    setPlayer(null);
-    setGameInfo(null);
-    setScreen("auth");
-  }
+  if (screen === "loading") return (
+    <div className="app">
+      <div className="loading-screen">
+        <div className="loading-logo">X ✕ O</div>
+        <span className="spin">⟳</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="app">
-      {screen==="loading" && (
-        <div className="loading-screen">
-          <div className="loading-logo">X ✕ O</div>
-          <span className="spin" style={{fontSize:"1.5rem"}}>⟳</span>
-        </div>
-      )}
-      {screen==="auth" && <AuthScreen onAuth={handleAuth}/>}
+      {screen==="auth" && <AuthScreen onAuth={p=>{ setPlayer(p); setScreen("lobby"); }} />}
       {screen==="lobby" && player && (
         <Lobby player={player}
           onJoinRoom={(id,role)=>{ setGameInfo({roomId:id,role}); setScreen("game"); }}
-          onLogout={handleLogout}
-          toast={toast}/>
+          onLogout={()=>{ setPlayer(null); setGameInfo(null); setScreen("auth"); }}
+          toast={toast} />
       )}
       {screen==="game" && player && gameInfo && (
         <GameRoom roomId={gameInfo.roomId} player={player} role={gameInfo.role}
-          onLeave={()=>setScreen("lobby")} toast={toast}/>
+          onLeave={()=>setScreen("lobby")} toast={toast} />
       )}
-      <Toasts toasts={toast.toasts}/>
+      <Toasts toasts={toast.toasts} />
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
